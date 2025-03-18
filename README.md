@@ -63,10 +63,13 @@ Projekt zakłada konfigurację sieci rozległej (WAN) na bazie topologii, która
 
 ### Weryfikacja:
 1. Sprawdzenie, czy urządzenia końcowe **Remote_A** i **Remote_B** uzyskują adresy IP w odpowiednich zakresach.
-![dhcp](https://github.com/user-attachments/assets/31589ba1-6020-483a-9369-4585bb99a924)
-![dhcp2](https://github.com/user-attachments/assets/bb2aad85-7329-41c6-8e35-264eaef8e4cf)
 
-3. Użycie polecenia **ping** do sprawdzenia łączności z bramą lokalną.
+| DHCP Remote_A | DHCP Remote_B  |
+|---------------|------------------|
+| ![dhcp](https://github.com/user-attachments/assets/5753aeab-1b22-4eab-a4fe-09c69497d4e1) | ![dhcp2](https://github.com/user-attachments/assets/bb2aad85-7329-41c6-8e35-264eaef8e4cf) |
+
+2. Użycie polecenia **ping** do sprawdzenia łączności z bramą lokalną.
+
 ![pingGate](https://github.com/user-attachments/assets/41430942-6d9c-4614-b5a3-543c8742f46d)
 
 ---
@@ -77,7 +80,7 @@ Projekt zakłada konfigurację sieci rozległej (WAN) na bazie topologii, która
 - **ISP1**, **ISP2**
 
 ### Cel:
-- Sprawdzenie łączności **G1-ISP1** oraz **G2-ISP2**.
+- Sprawdzenie łączności **Remote_A-ISP1** oraz **Remote_B-ISP2**.
 
 #### Adresacja łączy:
 
@@ -87,8 +90,9 @@ Projekt zakłada konfigurację sieci rozległej (WAN) na bazie topologii, która
 | **G2-ISP2**   | **195.29.151.4/30** |
 
 ### Weryfikacja:
-1. Upewnienie się, że **G1** ma łączność z **ISP1**, a **G2** z **ISP2** (sprawdzenie z użyciem **ping**).
+1. Upewnienie się, że **Remote_A** ma łączność z **ISP1**, a **Remote_B** z **ISP2**.
 
+![Remote-ISP](https://github.com/user-attachments/assets/2693d3bd-1b89-45bc-a99a-654616717d3d)
 ---
 
 ## 3. Implementacja NAT overload na G1 i G2
@@ -120,6 +124,7 @@ interface GigabitEthernet0/0/0
 #### Weryfikacja
    - Sprawdzenie łączności pomiędzy Remote_A-ISP1 oraz Remote_B-ISP2 za pomocą ping.
 
+![image](https://github.com/user-attachments/assets/2bd1562e-3e37-487d-a9df-f3fece7d92ba)
 
 ## 4. Konfiguracja łącza pomiędzy ISP1, ISP2 i ISP3
 
@@ -127,11 +132,18 @@ interface GigabitEthernet0/0/0
 
 | Łącze         | Adresacja        |
 |--------------|------------------|
-| **ISP1-ISP3** | **209.165.201.0/30** |
-| **ISP2-ISP3** | **209.165.201.4/30** |
+| **ISP1-ISP3** | **81.26.16.0/30** |
+| **ISP2-ISP3** | **81.26.16.4/30** |
+
+![Szeregowe](https://github.com/user-attachments/assets/89210b05-b32d-4f15-b382-98b4f078dffe)
+
 
 ### 4.2 Konfiguracja segmentu Label Switching  
-Zastosowanie urządzenia **FR_SW** do implementacji **MPLS Label Switching**.
+Zastosowanie urządzenia **FR_SW** do implementacji **Label Switching**.
+
+| FR_SW | ISP  |
+|---------------|------------------|
+| ![FR_SW](https://github.com/user-attachments/assets/2b5b66c7-c628-4c66-9441-23b0455b495b) | ![frame](https://github.com/user-attachments/assets/ae7ec1e1-7574-499a-9cc3-29dc90409f08) |
 
 ---
 
@@ -206,6 +218,9 @@ interface GigabitEthernet0/0/0.22
  standby 22 priority 110
  standby 22 preempt
 ```
+| HSRP |  Interfejsy |
+|---------------|------------------|
+| ![HSRP](https://github.com/user-attachments/assets/1014c26c-fb1b-4b8f-84fd-9c03806c6126) | ![G3_G4](https://github.com/user-attachments/assets/f2014825-c3df-48dd-8607-2f7495802193) |
 
 ### 6.2 Konfiguracja przełącznika S34.
 ```bash
@@ -228,6 +243,7 @@ int range f0/10-20
  spanning-tree portfast
  spanning-tree bpduguard enable
 ```
+![vlan](https://github.com/user-attachments/assets/35094540-60eb-40b6-95ab-1e43a4f57f20)
 
 ## 7. Konfiguracja eBGP
 
@@ -278,6 +294,11 @@ router bgp 3925
  neighbor 209.165.201.5 remote-as 24848
  network 209.165.200.128 mask 255.255.255.128
 ```
+
+#### Weryfikacja
+ - Sprawdzenie łączności z Remote-HQ_LAN.
+
+![pingHQ](https://github.com/user-attachments/assets/3b4afd31-6186-4e32-93a7-804f24b165ca)
 
 ## 8. Konfiguracja GRE VPN
 
@@ -381,6 +402,14 @@ router ospf 1
  network 10.10.10.4 0.0.0.3 area 0
  network 10.10.10.8 0.0.0.3 area 0
 ```
+
+#### Weryfikacja
+ - Sprawdzenie łączności przez VPN.
+
+![pingVPN](https://github.com/user-attachments/assets/d1245b85-69e5-4bc6-81a9-61a66131d0a7)
+ - Sprawdzenie łączności między Remote_A-Remote_B.
+
+![pingRemote](https://github.com/user-attachments/assets/be666817-161d-4ab5-b355-1dd9834aa431)
 
 
 
